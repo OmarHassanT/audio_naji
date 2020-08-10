@@ -33,7 +33,7 @@ class Signaling {
   String _selfId;
 
   // SimpleWebSocket _socket;
-  var _sessionId="123";
+  final _sessionId;
   var _host;
   var _port = 8086;
   var _peerConnections = new Map<String, RTCPeerConnection>();
@@ -225,7 +225,7 @@ class Signaling {
          var description = data['description'];
           var media = data['media'];
            var sessionId = data['session_id'];
-           this._sessionId = sessionId;
+          //  this._sessionId = sessionId;
 
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateNew);
@@ -286,7 +286,7 @@ class Signaling {
           if (pc != null) {
             pc.close();
           }
-          this._sessionId = null;
+          // this._sessionId = null;
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateBye);
           }
@@ -315,7 +315,7 @@ class Signaling {
             _dataChannels.remove(to);
           }
 
-          this._sessionId = null;
+          // this._sessionId = null;
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateBye);
           }
@@ -422,19 +422,22 @@ class Signaling {
 //       print(err);
 //     });
 String docQuery = r"""
-subscription MySubscription($_selfId: String!) {
-  call(where: {User_id: {_eq: $_selfId}}) {
+subscription MySubscription($selfId:String!,$channelId:String!) {
+  call_signaling_beta(where: {channel_id: {_eq: $channelId}, created_by: {_neq: $selfId}}) {
     data
   }
 }
 
-""";s
+""";
 
-Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{"_selfId": _selfId});
+Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{
+  "selfId": _selfId,
+  "channelId":_sessionId
+});
   snapshot.listen((data) {
     print("recived data:");
 
-    List<dynamic> dataa = data["data"]["call"];
+    List<dynamic> dataa = data["data"]["call_signaling_beta"];
     dataa.forEach((element) {
        print(element["data"]);
       if(element["data"]["type"]=="offer" &&!offerPassed){
@@ -572,8 +575,8 @@ Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{"_selfId": _s
     Map<String, dynamic> request = new Map();
     request["type"] = event;
     request["data"] = data;
-    var cby = data["from"];
-var reciverID=data["to"];
+    var selfId = data["from"];
+// var reciverID=data["to"];
 //     String docQuery = r"""
 // mutation MyMutation($cby:String!,$request:jsonb!,$cid:String!) {
 //   insert_call_signaling_beta(objects: {created_by: $cby, data:$request,channel_id:$cid }) {
@@ -591,18 +594,27 @@ var reciverID=data["to"];
 //     print(r);
     //  _socket.send(_encoder.convert(request));
 
-     String docQuery = r"""
+//      String docQuery = r"""
 
-mutation MyMutation($reciverID:String!,$request:jsonb!) {
-  insert_call(objects: {User_id: $reciverID, data:$request }) {
+// mutation MyMutation($reciverID:String!,$request:jsonb!) {
+//   insert_call(objects: {User_id: $reciverID, data:$request }) {
+//     affected_rows
+//   }
+// }
+
+// """;
+String newQuerey=r"""
+mutation MyMutation($selfId: String!, $channelId: String!,$data:jsonb) {
+  insert_call_signaling_beta(objects: {created_by: $selfId, channel_id: $channelId, data: $data}) {
     affected_rows
   }
 }
-
 """;
-     var r=   await  hasuraConnect.mutation(docQuery,variables:{
-       "reciverID":reciverID,
-       "request":request
+     var r=   await  hasuraConnect.mutation(newQuerey,variables:{
+       "selfId":selfId,
+       "data":request,
+       "channelId":data["session_id"]
+
      } );
      print("send data:");
     print(r);

@@ -18,8 +18,8 @@ class CallSample extends StatefulWidget {
 
 class _CallSampleState extends State<CallSample> {
   // Signaling _signaling;
-  String _selfId = "2";
-  String _peerId = "1";
+  String _selfId = "1";
+  String _peerId = "2";
    String channelId="123";
   // RTCVideoRenderer _localRenderer = RTCVideoRenderer();
   // RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();

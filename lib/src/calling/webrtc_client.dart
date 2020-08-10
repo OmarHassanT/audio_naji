@@ -28,7 +28,6 @@ class WebRtcClient {
    _initRenderers() async {
     await _localRenderer.initialize();
     await _remoteRenderer.initialize();
-    // _signaling = Signaling(selfId, channelId);
 
   }
 
@@ -36,30 +35,30 @@ class WebRtcClient {
     if (_signaling == null) {
      _signaling= Signaling(selfId, channelId)..connect();
 
-      _signaling.onStateChange = (SignalingState state) {
-        switch (state) {
-          case SignalingState.CallStateNew:
-            _inCalling = true;
+      // _signaling.onStateChange = (SignalingState state) {
+      //   switch (state) {
+      //     case SignalingState.CallStateNew:
+      //       _inCalling = true;
 
-            break;
-          case SignalingState.CallStateBye:
-            _localRenderer.srcObject = null;
-            _remoteRenderer.srcObject = null;
-            _inCalling = false;
+      //       break;
+      //     case SignalingState.CallStateBye:
+      //       _localRenderer.srcObject = null;
+      //       _remoteRenderer.srcObject = null;
+      //       _inCalling = false;
 
-            break;
-          case SignalingState
-              .CallStateInvite: ///////////////////cases of ringing
-          case SignalingState.CallStateConnected:
-            break;
-          case SignalingState.CallStateRinging:
-            break;
-          case SignalingState.ConnectionClosed:
-          case SignalingState.ConnectionError:
-          case SignalingState.ConnectionOpen:
-            break;
-        }
-      };
+      //       break;
+      //     case SignalingState
+      //         .CallStateInvite: ///////////////////cases of ringing
+      //     case SignalingState.CallStateConnected:
+      //       break;
+      //     case SignalingState.CallStateRinging:
+      //       break;
+      //     case SignalingState.ConnectionClosed:
+      //     case SignalingState.ConnectionError:
+      //     case SignalingState.ConnectionOpen:
+      //       break;
+      //   }
+      // };
 
       // _signaling.onPeersUpdate = ((event) {
       //   _selfId = event['self'];
