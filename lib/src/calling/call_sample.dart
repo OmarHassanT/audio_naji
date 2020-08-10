@@ -17,19 +17,15 @@ class CallSample extends StatefulWidget {
 }
 
 class _CallSampleState extends State<CallSample> {
-  // Signaling _signaling;
   String _selfId = "1";
   String _peerId = "2";
    String channelId="123";
-  // RTCVideoRenderer _localRenderer = RTCVideoRenderer();
-  // RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
   
   String media;
   bool _inCalling = false;
   bool isSpeaker = true;
   bool mute = false;
   WebRtcClient _webRtcClient;
-  // final String serverIP;
 
   _CallSampleState({Key key});
 
@@ -37,105 +33,13 @@ class _CallSampleState extends State<CallSample> {
   initState() {
     super.initState();
        _webRtcClient = WebRtcClient(channelId, peerId: _peerId, selfId: _selfId);
-
-    // initRenderers();
-    // _connect();
-
   }
-
-  // initRenderers() async {
-  //   await _localRenderer.initialize();
-  //   await _remoteRenderer.initialize();
-
-  // }
 
   @override
   deactivate() {
-    super.deactivate();
-    // if (_signaling != null) _signaling.close();
-    // _localRenderer.dispose();
-    // _remoteRenderer.dispose();
+    super.deactivate(); 
   }
-  // void _connect() async {
-  //   if (_signaling == null) {
-  //     _signaling = Signaling(_selfId)..connect();
-
-  //     _signaling.onStateChange = (SignalingState state) {
-  //       switch (state) {
-  //         case SignalingState.CallStateNew:
-  //           this.setState(() {
-  //             _inCalling = true;
-  //           });
-         
-            
-  //           break;
-  //         case SignalingState.CallStateBye:
-  //           this.setState(() {
-  //             _localRenderer.srcObject = null;
-  //             _remoteRenderer.srcObject = null;
-  //             _inCalling = false;
-  //           });
-  //           break;
-  //         case SignalingState
-  //             .CallStateInvite: ///////////////////cases of ringing
-  //         case SignalingState.CallStateConnected:
-  //         break;
-  //         case SignalingState.CallStateRinging:
-        
-  //         break;
-  //         case SignalingState.ConnectionClosed:
-  //         case SignalingState.ConnectionError:
-  //         case SignalingState.ConnectionOpen:
-  //           break;
-  //       }
-  //     };
-
-  //     _signaling.onPeersUpdate = ((event) {
-  //       this.setState(() {
-  //         _selfId = event['self'];
-  //       });
-  //     });
-
-  //     _signaling.onLocalStream = ((stream) {
-  //       _localRenderer.srcObject = stream;
-  //     });
-
-  //     _signaling.onAddRemoteStream = ((stream) {
-  //       _remoteRenderer.srcObject = stream;
-  //     });
-
-  //     _signaling.onRemoveRemoteStream = ((stream) {
-  //       _remoteRenderer.srcObject = null;
-  //     });
-  //   }
-  // }
-  // _invitePeer(context, peerId, media) async {
-  //   if (_signaling != null && peerId != _selfId && peerId!=null) {
-  //     _signaling.invite(peerId, media);
-  //   }
-  // }
-
-  // _hangUp() {
-  //   if (_signaling != null) {
-  //     _signaling.close();
-  //      this.setState(() {
-  //             _localRenderer.srcObject = null;
-  //             _remoteRenderer.srcObject = null;
-  //             _inCalling = false;
-  //           });
-  //               }
-
-  //     _signaling.bye(_peerId);
-  // }
-
-  // _muteMic(mute) {
-  //   _signaling.microphoneMute(mute);
-  // }
-
-  // _speakerEnable(speakerEnable) {
-  //   _signaling.speakerPhone(speakerEnable);
-  // }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(

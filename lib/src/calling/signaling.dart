@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:async';
 import 'package:flutter_webrtc/webrtc.dart';
 import 'package:hasura_connect/hasura_connect.dart';
@@ -28,21 +27,17 @@ class Signaling {
 
   Signaling(this._selfId, this._sessionId);
 
-  JsonEncoder _encoder = new JsonEncoder();
-  JsonDecoder _decoder = new JsonDecoder();
+ 
   String _selfId;
-
-  // SimpleWebSocket _socket;
   final _sessionId;
-  var _host;
-  var _port = 8086;
+  bool offerPassed=false;
+  List<int> ids = [];
+  
   var _peerConnections = new Map<String, RTCPeerConnection>();
   var _dataChannels = new Map<String, RTCDataChannel>();
   var _remoteCandidates = [];
   var _turnCredential;
-  bool offerPassed=false;
-  List<int> ids = [];
-  
+
   MediaStream _localStream;
   List<MediaStream> _remoteStreams;
   SignalingStateCallback onStateChange;
@@ -84,21 +79,6 @@ class Signaling {
     },
     'optional': [],
   };
-  // final Map<String, dynamic> _video_constraints = {
-  //   'mandatory': {
-  //     'OfferToReceiveAudio': true,
-  //     'OfferToReceiveVideo': true,
-  //   },
-  //   'optional': [],
-  // };
-
-  // final Map<String, dynamic> _dc_constraints = {
-  //   'mandatory': {
-  //     'OfferToReceiveAudio': false,
-  //     'OfferToReceiveVideo': false,
-  //   },
-  //   'optional': [],
-  // };
 
 
 
@@ -148,9 +128,6 @@ class Signaling {
 
     _createPeerConnection(peer_id, media).then((pc) {
       _peerConnections[peer_id] = pc;
-      // if (media == 'data') {
-      //   _createDataChannel(peer_id, pc);
-      // }
       _createOffer(peer_id, pc, media);
     });
   }
@@ -163,69 +140,18 @@ class Signaling {
     });
   }
 
-  // accept2(id, String media) async {
-  //   var pc = await _createPeerConnection(id, media);
-  //   _peerConnections[id] = pc;
-  //   await pc.setRemoteDescription(
-  //       new RTCSessionDescription(description['sdp'], description['type']));
-
-  //   await _createAnswer(id, pc, media);
-  //   if (this._remoteCandidates.length > 0) {
-  //     _remoteCandidates.forEach((candidate) async {
-  //       await pc.addCandidate(candidate);
-  //     });
-  //     _remoteCandidates.clear();
-  //   }
-  // }
-
-//   String updataQuerySetValidFalse = r"""
-//       mutation MyMutation2($sessionId:String!) {
-//   update_call_signaling(_set: {valid: false}, where: {session_id: {_eq:$sessionId}}) {
-//     affected_rows
-//   }
-// }
-//       """;
-  // accept(String media) {
-  //   _createPeerConnection(id, media).then((pc) {
-  //     _peerConnections[id] = pc;
-  //     pc.setRemoteDescription(
-  //         new RTCSessionDescription(description['sdp'], description['type']));
-  //     _createAnswer(id, pc, media);
-  //     if (this._remoteCandidates.length > 0) {
-  //       _remoteCandidates.forEach((candidate) async {
-  //         await pc.addCandidate(candidate);
-  //       });
-  //       _remoteCandidates.clear();
-  //     }
-  //   });
-  //   if (this.onStateChange != null) {
-  //     this.onStateChange(SignalingState.CallStateRinging);
-  //   }
-  // }
-
   void onMessage(message) async {
     Map<String, dynamic> mapData = message;
     var data = mapData['data'];
 
     switch (mapData['type']) {
-      // case 'peers':
-      //   {
-      //     List<dynamic> peers = data;
-      //     if (this.onPeersUpdate != null) {
-      //       Map<String, dynamic> event = new Map<String, dynamic>();
-      //       event['self'] = _selfId;
-      //       event['peers'] = peers;
-      //       this.onPeersUpdate(event);
-      //     }
-      //   }
-      //   break;
+    
       case 'offer':
         {
           var id = data['from'];
          var description = data['description'];
           var media = data['media'];
-           var sessionId = data['session_id'];
-          //  this._sessionId = sessionId;
+           
 
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateNew);
@@ -315,7 +241,7 @@ class Signaling {
             _dataChannels.remove(to);
           }
 
-          // this._sessionId = null;
+          
           if (this.onStateChange != null) {
             this.onStateChange(SignalingState.CallStateBye);
           }
@@ -332,23 +258,10 @@ class Signaling {
   }
 
   void connect() async {
-    // var url = 'https://$_host:$_port/ws';
-    //  _socket = SimpleWebSocket(url);
-
-    // print('connect to $url');
-
+   
     if (_turnCredential == null) {
       try {
-        // _turnCredential = await getTurnCredential(_host, _port);
-        /*{
-            "username": "1584195784:mbzrxpgjys",
-            "password": "isyl6FF6nqMTB9/ig5MrMRUXqZg",
-            "ttl": 86400,
-            "uris": ["turn:127.0.0.1:19302?transport=udp"]
-          }
-        */
-        //////////////////////////////////////////////////////////////////////////
-
+      
         _iceServers = {
           'iceServers': [
             {
@@ -359,68 +272,10 @@ class Signaling {
           ]
         };
 
-        //  _iceServers = {
-        //   'iceServers': [
-        //     {
-        //       'url': _turnCredential['uris'][0],
-        //       'username': _turnCredential['username'],
-        //       'credential': _turnCredential['password']
-        //     },
-        //   ]
-        // };
       } catch (e) {}
     }
 
-    // // this.onStateChange(SignalingState.ConnectionOpen);
-    // _send('new', {
-    //   'name': DeviceInfo.label,
-    //   'id': _selfId,
-    //   'user_agent': DeviceInfo.userAgent
-    // });
-    // _socket.onOpen = () {
-    //   print('onOpen');
-    //   this?.onStateChange(SignalingState.ConnectionOpen);
-    //   _send('new', {
-    //     'name': DeviceInfo.label,
-    //     'id': _selfId,
-    //     'user_agent': DeviceInfo.userAgent
-    //   });
-    // };
-
-    // _socket.onMessage = (message) {
-    //   print('Recivied data: ' + message);
-    //   JsonDecoder decoder = new JsonDecoder();
-    //   this.onMessage(decoder.convert(message));
-    // };
-
-    // _socket.onClose = (int code, String reason) {
-    //   print('Closed by server [$code => $reason]!');
-    //   if (this.onStateChange != null) {
-    //     this.onStateChange(SignalingState.ConnectionClosed);
-    //   }
-    // };
-
-    // await _socket.connect();
-//     String docQuery = r"""
-//     subscription MySubscription($cid: String!, $selfId: String!) {
-//       call_signaling_beta(where: {channel_id: {_eq: $cid}, created_by: {_neq: $selfId}}) {
-//         data
-//       }
-//     }
-// """;
-
-//     Snapshot snapshot =hasuraConnect.subscription(docQuery, variables: {"selfId": _selfId , "cid":"123"});
-//     snapshot.listen((data)  {
-//       print("recived data:");
-//       List<dynamic> dataa = data["data"]["call_signaling_beta"];
-//       dataa.forEach((element){
-//         print(element["data"]);
-//         this.onMessage(element["data"]);
-//          }
-//       );
-//     }).onError((err) {
-//       print(err);
-//     });
+   
 String docQuery = r"""
 subscription MySubscription($selfId:String!,$channelId:String!) {
   call_signaling_beta(where: {channel_id: {_eq: $channelId}, created_by: {_neq: $selfId}}) {
@@ -463,20 +318,6 @@ Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{
       'audio': true,
       'video': false
     };
-//  final Map<String, dynamic> mediaConstraintsVideo = {
-//       'audio': true,
-//       'video': {
-//         'mandatory': {
-//           'minWidth':
-//               '640', // Provide your own width, height and frame rate here
-//           'minHeight': '480',
-//           'minFrameRate': '30',
-//         },
-//         'facingMode': 'user',
-//         'optional': [],
-//       }
-//     };
-// var mediaConstraints= media=='audio'?mediaConstraintsAudio:mediaConstraintsVideo;
     MediaStream stream = await navigator.getUserMedia(mediaConstraintsAudio);
     if (this.onLocalStream != null) {
       this.onLocalStream(stream);
@@ -515,29 +356,8 @@ Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{
       });
     };
 
-    // pc.onDataChannel = (channel) {
-    //   _addDataChannel(id, channel);
-    // };
-
     return pc;
   }
-
-  // _addDataChannel(id, RTCDataChannel channel) {
-  //   channel.onDataChannelState = (e) {};
-  //   channel.onMessage = (RTCDataChannelMessage data) {
-  //     if (this.onDataChannelMessage != null)
-  //       this.onDataChannelMessage(channel, data);
-  //   };
-  //   _dataChannels[id] = channel;
-
-  //   if (this.onDataChannel != null) this.onDataChannel(channel);
-  // }
-
-  // _createDataChannel(id, RTCPeerConnection pc, {label: 'fileTransfer'}) async {
-  //   RTCDataChannelInit dataChannelDict = new RTCDataChannelInit();
-  //   RTCDataChannel channel = await pc.createDataChannel(label, dataChannelDict);
-  //   _addDataChannel(id, channel);
-  // }
 
   _createOffer(String id, RTCPeerConnection pc, String media) async {
     try {
@@ -576,33 +396,7 @@ Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{
     request["type"] = event;
     request["data"] = data;
     var selfId = data["from"];
-// var reciverID=data["to"];
-//     String docQuery = r"""
-// mutation MyMutation($cby:String!,$request:jsonb!,$cid:String!) {
-//   insert_call_signaling_beta(objects: {created_by: $cby, data:$request,channel_id:$cid }) {
-//     affected_rows
-//   }
-// }
-// """;
 
-//     var r = await hasuraConnect.mutation(docQuery, variables: {
-//       "cby": cby,
-//       "request": request,
-//       "cid": data["session_id"]
-//     });
-//     print("send data:");
-//     print(r);
-    //  _socket.send(_encoder.convert(request));
-
-//      String docQuery = r"""
-
-// mutation MyMutation($reciverID:String!,$request:jsonb!) {
-//   insert_call(objects: {User_id: $reciverID, data:$request }) {
-//     affected_rows
-//   }
-// }
-
-// """;
 String newQuerey=r"""
 mutation MyMutation($selfId: String!, $channelId: String!,$data:jsonb) {
   insert_call_signaling_beta(objects: {created_by: $selfId, channel_id: $channelId, data: $data}) {

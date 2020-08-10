@@ -3,12 +3,13 @@ import 'package:flutter_webrtc/rtc_video_view.dart';
 import 'package:videoAppFluuter/src/calling/signaling.dart';
 
 class WebRtcClient {
-  String channelId;
+
   WebRtcClient(this.channelId, {@required this.selfId ,@required  this.peerId}) {
     _initRenderers();
   }
 
   Signaling _signaling;
+  String channelId;
   String selfId;
   String peerId;
 
@@ -16,13 +17,9 @@ class WebRtcClient {
   RTCVideoRenderer _remoteRenderer = RTCVideoRenderer();
 
   String media = "audio";
-  bool _inCalling = false;
 
   join() {
-    //check if channel id exist in database
-    //if not
-    //call inivite 
-    //else only connect 
+   
     _connect();
   }
    _initRenderers() async {
@@ -34,35 +31,6 @@ class WebRtcClient {
   void _connect() async {
     if (_signaling == null) {
      _signaling= Signaling(selfId, channelId)..connect();
-
-      // _signaling.onStateChange = (SignalingState state) {
-      //   switch (state) {
-      //     case SignalingState.CallStateNew:
-      //       _inCalling = true;
-
-      //       break;
-      //     case SignalingState.CallStateBye:
-      //       _localRenderer.srcObject = null;
-      //       _remoteRenderer.srcObject = null;
-      //       _inCalling = false;
-
-      //       break;
-      //     case SignalingState
-      //         .CallStateInvite: ///////////////////cases of ringing
-      //     case SignalingState.CallStateConnected:
-      //       break;
-      //     case SignalingState.CallStateRinging:
-      //       break;
-      //     case SignalingState.ConnectionClosed:
-      //     case SignalingState.ConnectionError:
-      //     case SignalingState.ConnectionOpen:
-      //       break;
-      //   }
-      // };
-
-      // _signaling.onPeersUpdate = ((event) {
-      //   _selfId = event['self'];
-      // });
 
       _signaling.onLocalStream = ((stream) {
         _localRenderer.srcObject = stream;
@@ -95,13 +63,7 @@ class WebRtcClient {
     _muteSpeaker(!mute);
   }
 
-  disposeClient() {
-    _hangUp();
-    if (_signaling != null) _signaling.close();
-    _localRenderer.dispose();
-    _remoteRenderer.dispose();
-  }
-
+  
  
   _invitePeer(peerId, media) async {
     if (_signaling != null && peerId != selfId && peerId != null) {
@@ -115,7 +77,7 @@ class WebRtcClient {
 
       _localRenderer.srcObject = null;
       _remoteRenderer.srcObject = null;
-      _inCalling = false;
+      
     }
 
     _signaling.bye(peerId);
@@ -128,8 +90,6 @@ class WebRtcClient {
   _muteSpeaker(bool mute) {
     mute ? _signaling.speakerMute(0) : _signaling.speakerMute(1);
   }
-  // _speakerEnable(speakerEnable) {
-  //   _signaling.speakerPhone(speakerEnable);
-  // }
+ 
 
 }
