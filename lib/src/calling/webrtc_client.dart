@@ -1,6 +1,10 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter_webrtc/rtc_video_view.dart';
-import 'package:videoAppFluuter/src/calling/signaling.dart';
+// import 'package:flutter/cupertino.dart';
+// import 'package:flutter_webrtc/rtc_video_view.dart';//import 'package:flutter_webrtc/web/rtc_video_view.dart'; this for web
+// import 'package:videoAppFluuter/src/calling/signaling.dart';
+import 'package:flutter/material.dart';
+import 'dart:core';
+import 'signaling.dart';
+import 'package:flutter_webrtc/webrtc.dart';
 
 class WebRtcClient {
 

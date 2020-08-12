@@ -17,8 +17,8 @@ class CallSample extends StatefulWidget {
 }
 
 class _CallSampleState extends State<CallSample> {
-  String _selfId = "1";
-  String _peerId = "2";
+  String _selfId = "2";
+  String _peerId = "1";
    String channelId="123";
   
   String media;

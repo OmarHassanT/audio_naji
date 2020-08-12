@@ -1,6 +1,8 @@
+import 'package:hasura_connect/hasura_connect.dart';
 import 'dart:async';
 import 'package:flutter_webrtc/webrtc.dart';
-import 'package:hasura_connect/hasura_connect.dart';
+
+
 
 enum SignalingState {
   CallStateNew,
@@ -291,6 +293,7 @@ Snapshot snapshot = hasuraConnect.subscription(docQuery,variables:{
 });
   snapshot.listen((data) {
     print("recived data:");
+snapshot.cleanCache();
 
     List<dynamic> dataa = data["data"]["call_signaling_beta"];
     dataa.forEach((element) {
